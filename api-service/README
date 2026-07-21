@@ -1,0 +1,99 @@
+/*
+|--------------------------------------------------------------------------
+| Prisma Client
+|--------------------------------------------------------------------------
+|
+| Prisma erzeugt aus den Models in dieser Datei einen TypeScript-Client.
+|
+| Beispiel:
+|   prisma.user.findUnique(...)
+|   prisma.user.create(...)
+|
+| Nach jeder Änderung an den Models muss der Client neu generiert werden:
+|
+|   npx prisma generate
+|
+*/
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+/*
+|--------------------------------------------------------------------------
+| Datenbankverbindung
+|--------------------------------------------------------------------------
+|
+| Hier wird festgelegt, welche Datenbank Prisma verwendet.
+|
+| provider = "postgresql"
+| -> Prisma verbindet sich mit einer PostgreSQL-Datenbank.
+|
+| Die Verbindungsdaten stehen in der .env-Datei:
+|
+| DATABASE_URL="postgresql://user:password@localhost:5432/database"
+|
+*/
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/*
+|--------------------------------------------------------------------------
+| Models (Tabellen)
+|--------------------------------------------------------------------------
+|
+| Jedes Model entspricht einer Tabelle in der Datenbank.
+|
+| Beispiel:
+|
+| model User {
+|   id    String @id @default(uuid())
+|   email String @unique
+| }
+|
+| erzeugt bzw. beschreibt die Tabelle "User".
+|
+| WICHTIG:
+|
+| Auch wenn die Tabellen bereits in PostgreSQL existieren,
+| müssen sie hier als Models vorhanden sein.
+|
+| Prisma arbeitet NICHT direkt mit den Tabellen,
+| sondern ausschließlich mit den Models in dieser Datei.
+|
+| Existiert hier kein Model "User",
+| dann gibt es später auch keinen Zugriff über:
+|
+|   prisma.user.findUnique(...)
+|
+| sondern prisma.user ist undefined.
+|
+|--------------------------------------------------------------------------
+| Zwei Möglichkeiten
+|--------------------------------------------------------------------------
+|
+| 1. Neue Datenbank
+|
+|    -> Models selbst schreiben
+|    -> Tabellen erzeugen mit:
+|
+|       npx prisma migrate dev
+|
+|
+| 2. Tabellen existieren bereits
+|
+|    -> Tabellen aus der Datenbank einlesen:
+|
+|       npx prisma db pull
+|
+|    Prisma erstellt daraus automatisch die Models.
+|
+|    Anschließend:
+|
+|       npx prisma generate
+|
+|--------------------------------------------------------------------------
+*/
