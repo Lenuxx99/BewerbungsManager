@@ -2,11 +2,18 @@ import {
   useEffect,
   useState,
   type ChangeEvent,
+  type FormEvent,
 } from "react";
+
 import { useNavigate } from "react-router";
+import {
+  GoogleLogin,
+  type CredentialResponse,
+} from "@react-oauth/google";
 
 import { useAuth } from "../context/AuthContext";
 import "../styles/ProtectedRoute.css";
+
 type AuthMode = "login" | "register";
 
 type FormData = {
@@ -16,44 +23,60 @@ type FormData = {
   password: string;
 };
 
+const API_URL = "http://localhost:3000/api";
+
 function AuthPage() {
-  const [mode, setMode] = useState<AuthMode>("login");
+  const [mode, setMode] =
+    useState<AuthMode>("login");
+
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [isLoading, setIsLoading] =
+    useState(false);
+
+  const [isGoogleLoading, setIsGoogleLoading] =
+    useState(false);
+
+  const [isCheckingAuth, setIsCheckingAuth] =
+    useState(true);
 
   const navigate = useNavigate();
   const { refreshUser } = useAuth();
 
-  const [formData, setFormData] = useState<FormData>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] =
+    useState<FormData>({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    });
 
   useEffect(() => {
     let isMounted = true;
 
     async function checkExistingLogin() {
-      const isAuthenticated = await refreshUser();
+      try {
+        const isAuthenticated =
+          await refreshUser();
 
-      if (!isMounted) {
-        return;
+        if (!isMounted) {
+          return;
+        }
+
+        if (isAuthenticated) {
+          navigate("/dashboard", {
+            replace: true,
+          });
+
+          return;
+        }
+      } finally {
+        if (isMounted) {
+          setIsCheckingAuth(false);
+        }
       }
-
-      if (isAuthenticated) {
-        navigate("/dashboard", {
-          replace: true,
-        });
-
-        return;
-      }
-
-      setIsCheckingAuth(false);
     }
 
-    checkExistingLogin();
+    void checkExistingLogin();
 
     return () => {
       isMounted = false;
@@ -72,7 +95,7 @@ function AuthPage() {
   }
 
   async function handleSubmit(
-    event: any
+    event: FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
 
@@ -81,8 +104,8 @@ function AuthPage() {
 
     const endpoint =
       mode === "login"
-        ? "http://localhost:3000/api/auth/login"
-        : "http://localhost:3000/api/auth/register";
+        ? `${API_URL}/auth/login`
+        : `${API_URL}/auth/register`;
 
     const requestBody =
       mode === "login"
@@ -106,7 +129,17 @@ function AuthPage() {
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Ein Fehler ist aufgetreten"
+          data.message ||
+          "Ein Fehler ist aufgetreten."
+        );
+      }
+
+      const isAuthenticated =
+        await refreshUser();
+
+      if (!isAuthenticated) {
+        throw new Error(
+          "Die Anmeldung konnte nicht bestätigt werden."
         );
       }
 
@@ -117,12 +150,82 @@ function AuthPage() {
       const message =
         error instanceof Error
           ? error.message
-          : "Ein unbekannter Fehler ist aufgetreten";
+          : "Ein unbekannter Fehler ist aufgetreten.";
 
       setError(message);
     } finally {
       setIsLoading(false);
     }
+  }
+
+  async function handleGoogleSuccess(
+    credentialResponse: CredentialResponse
+  ) {
+    const credential = credentialResponse.credential;
+
+    if (!credential) {
+      setError(
+        "Google hat kein gültiges Credential zurückgegeben."
+      );
+
+      return;
+    }
+
+    setError("");
+    setIsGoogleLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/auth/google`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            credential,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+          "Google-Anmeldung fehlgeschlagen."
+        );
+      }
+
+      const isAuthenticated =
+        await refreshUser();
+
+      if (!isAuthenticated) {
+        throw new Error(
+          "Die Google-Anmeldung konnte nicht bestätigt werden."
+        );
+      }
+
+      navigate("/dashboard", {
+        replace: true,
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Google-Anmeldung fehlgeschlagen.";
+
+      setError(message);
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  }
+
+  function handleGoogleError() {
+    setError(
+      "Die Google-Anmeldung wurde abgebrochen oder ist fehlgeschlagen."
+    );
   }
 
   function switchMode(newMode: AuthMode) {
@@ -150,17 +253,23 @@ function AuthPage() {
           <h2>Anmeldung wird geprüft</h2>
 
           <p>
-            Bitte einen Moment Geduld. Deine Sitzung wird
-            sicher überprüft.
+            Bitte einen Moment Geduld. Deine
+            Sitzung wird sicher überprüft.
           </p>
         </div>
       </main>
     );
   }
 
+  const authenticationInProgress =
+    isLoading || isGoogleLoading;
+
   return (
     <main className="auth-page">
-      <section className="auth-card">
+      <section
+        className={`auth-card ${mode === "register" ? "auth-card-register" : "auth-card-login"
+          }`}
+      >
         <div className="auth-header">
           <h1>Bewerbungsmanager</h1>
 
@@ -171,11 +280,47 @@ function AuthPage() {
           </p>
         </div>
 
+
+
+        <div className="google-login-container">
+          {isGoogleLoading ? (
+            <button
+              type="button"
+              className="google-loading-button"
+              disabled
+            >
+              Google-Anmeldung läuft...
+            </button>
+          ) : (
+            <GoogleLogin
+              onSuccess={(credentialResponse) => {
+                void handleGoogleSuccess(
+                  credentialResponse
+                );
+              }}
+              onError={handleGoogleError}
+              text={"continue_with"
+
+              }
+              shape="rectangular"
+              theme="outline"
+              size="large"
+              width="100%"
+            />
+          )}
+        </div>
+
+        <div className="auth-divider">
+          <span>oder</span>
+        </div>
         <div className="auth-tabs">
           <button
             type="button"
-            className={mode === "login" ? "active" : ""}
+            className={
+              mode === "login" ? "active" : ""
+            }
             onClick={() => switchMode("login")}
+            disabled={authenticationInProgress}
           >
             Login
           </button>
@@ -183,55 +328,71 @@ function AuthPage() {
           <button
             type="button"
             className={
-              mode === "register" ? "active" : ""
+              mode === "register"
+                ? "active"
+                : ""
             }
-            onClick={() => switchMode("register")}
+            onClick={() =>
+              switchMode("register")
+            }
+            disabled={authenticationInProgress}
           >
             Registrieren
           </button>
         </div>
-
         <form
           className="auth-form"
           onSubmit={handleSubmit}
         >
-          {mode === "register" && (
-            <div className="name-fields">
-              <div className="form-group">
-                <label htmlFor="firstName">
-                  Vorname
-                </label>
+          <div
+            className={`name-fields ${mode === "register"
+              ? "name-fields--open"
+              : "name-fields--closed"
+              }`}
+            aria-hidden={mode !== "register"}
+          >
+            <div className="form-group">
+              <label htmlFor="firstName">
+                Vorname
+              </label>
 
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="Max"
-                  autoComplete="off"
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="lastName">
-                  Nachname
-                </label>
-
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Mustermann"
-                  autoComplete="off"
-                  required
-                />
-              </div>
+              <input
+                id="firstName"
+                name="firstName"
+                type="text"
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="Max"
+                autoComplete="given-name"
+                required={mode === "register"}
+                disabled={
+                  authenticationInProgress ||
+                  mode !== "register"
+                }
+              />
             </div>
-          )}
+
+            <div className="form-group">
+              <label htmlFor="lastName">
+                Nachname
+              </label>
+
+              <input
+                id="lastName"
+                name="lastName"
+                type="text"
+                value={formData.lastName}
+                onChange={handleChange}
+                placeholder="Mustermann"
+                autoComplete="family-name"
+                required={mode === "register"}
+                disabled={
+                  authenticationInProgress ||
+                  mode !== "register"
+                }
+              />
+            </div>
+          </div>
 
           <div className="form-group">
             <label htmlFor="email">
@@ -245,8 +406,9 @@ function AuthPage() {
               value={formData.email}
               onChange={handleChange}
               placeholder="max@example.com"
-              autoComplete="off"
+              autoComplete="email"
               required
+              disabled={authenticationInProgress}
             />
           </div>
 
@@ -262,19 +424,30 @@ function AuthPage() {
               value={formData.password}
               onChange={handleChange}
               placeholder="Mindestens 8 Zeichen"
+              autoComplete={
+                mode === "login"
+                  ? "current-password"
+                  : "new-password"
+              }
               minLength={8}
               required
+              disabled={authenticationInProgress}
             />
           </div>
 
           {error && (
-            <p className="error-message">{error}</p>
+            <p
+              className="error-message"
+              role="alert"
+            >
+              {error}
+            </p>
           )}
 
           <button
             className="submit-button"
             type="submit"
-            disabled={isLoading}
+            disabled={authenticationInProgress}
           >
             {isLoading
               ? "Bitte warten..."
@@ -291,6 +464,7 @@ function AuthPage() {
 
           <button
             type="button"
+            disabled={authenticationInProgress}
             onClick={() =>
               switchMode(
                 mode === "login"

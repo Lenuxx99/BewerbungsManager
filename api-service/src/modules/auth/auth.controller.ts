@@ -5,7 +5,10 @@ import type {
 } from "express";
 
 import { authService } from "./auth.service";
+import { googleAuthService } from "./google-auth.service";
+
 import type {
+  GoogleLoginInput,
   LoginInput,
   RegisterInput,
 } from "./auth.schema";
@@ -24,9 +27,10 @@ export async function register(
   next: NextFunction
 ) {
   try {
-    const result = await authService.register(req.body);
-    console.log(result.user);
-    
+    const result = await authService.register(
+      req.body
+    );
+
     res.cookie(
       "access_token",
       result.accessToken,
@@ -37,7 +41,7 @@ export async function register(
       user: result.user,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 }
 
@@ -47,7 +51,9 @@ export async function login(
   next: NextFunction
 ) {
   try {
-    const result = await authService.login(req.body);
+    const result = await authService.login(
+      req.body
+    );
 
     res.cookie(
       "access_token",
@@ -59,7 +65,32 @@ export async function login(
       user: result.user,
     });
   } catch (error) {
-    next(error);
+    return next(error);
+  }
+}
+
+export async function loginWithGoogle(
+  req: Request<{}, {}, GoogleLoginInput>,
+  res: Response,
+  next: NextFunction
+) {
+  try {
+    const result =
+      await googleAuthService.loginWithGoogle(
+        req.body.credential
+      );
+
+    res.cookie(
+      "access_token",
+      result.accessToken,
+      cookieOptions
+    );
+
+    return res.status(200).json({
+      user: result,
+    });
+  } catch (error) {
+    return next(error);
   }
 }
 
@@ -71,7 +102,8 @@ export async function logout(
   try {
     res.clearCookie("access_token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure:
+        process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
     });
@@ -80,6 +112,6 @@ export async function logout(
       message: "Erfolgreich ausgeloggt.",
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 }

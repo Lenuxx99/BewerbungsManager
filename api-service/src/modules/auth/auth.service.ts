@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 import { authRepository } from "./auth.repository";
 import type { LoginInput, RegisterInput } from "./auth.schema.ts";
+import { createAccessToken } from "./jwt.utils";
 
 export class AuthError extends Error {
   constructor(
@@ -13,23 +14,6 @@ export class AuthError extends Error {
   }
 }
 
-function createAccessToken(userId: number): string {
-  const secret = process.env.JWT_SECRET;
-
-  if (!secret) {
-    throw new Error("JWT_SECRET ist nicht definiert");
-  }
-
-  return jwt.sign(
-    {
-      sub: userId,
-    },
-    secret,
-    {
-      expiresIn: "1h",
-    }
-  );
-}
 
 export const authService = {
   async register(input: RegisterInput) {

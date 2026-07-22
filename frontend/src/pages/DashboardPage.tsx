@@ -54,9 +54,8 @@ function DashboardPage() {
   const displayName =
     user?.first_name?.trim() || "Benutzer";
 
-  const initials = `${user?.first_name?.[0] ?? ""}${
-    user?.last_name?.[0] ?? ""
-  }`.toUpperCase() || "BM";
+  const initials = `${user?.first_name?.[0] ?? ""}${user?.last_name?.[0] ?? ""
+    }`.toUpperCase() || "BM";
 
   return (
     <div className="dashboard-layout">

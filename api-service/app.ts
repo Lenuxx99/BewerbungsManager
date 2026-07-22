@@ -39,8 +39,21 @@ app.use(express.json());
  * Öffentliche Auth-Routen.
  *
  * POST /api/auth/login
+ * Body: { email: string; password: string }
+ *
  * POST /api/auth/register
+ * Body: {
+ *   email: string;
+ *   password: string;
+ *   firstName: string;
+ *   lastName: string;
+ * }
+ *
  * POST /api/auth/logout
+ * Body: {}
+ *
+ * POST /api/auth/google
+ * Body: { credential: string }
  */
 app.use("/api/auth", authRouter);
 

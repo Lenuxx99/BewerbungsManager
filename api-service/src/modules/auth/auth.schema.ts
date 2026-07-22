@@ -18,6 +18,15 @@ export const loginSchema = z.object({
   }),
 });
 
+export const googleLoginSchema = z.object({
+  body: z.object({
+    credential: z
+      .string()
+      .trim()
+      .min(1, "Google-Credential fehlt"),
+  }),
+});
+
 export type RegisterInput = z.infer<
   typeof registerSchema
 >["body"];
@@ -25,3 +34,7 @@ export type RegisterInput = z.infer<
 export type LoginInput = z.infer<
   typeof loginSchema
 >["body"];
+
+
+export type GoogleLoginInput =
+  z.infer<typeof googleLoginSchema>["body"];
