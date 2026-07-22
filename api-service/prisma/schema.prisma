@@ -41,6 +41,24 @@ model users {
   status           String            @default("active") @db.VarChar(20)
   created_at       DateTime          @default(now()) @db.Timestamptz(6)
   updated_at       DateTime          @default(now()) @db.Timestamptz(6)
+  gmail_settings   gmail_settings?
   oauth_accounts   oauth_accounts[]
+  oauth_states     oauth_states[]
   user_credentials user_credentials?
+}
+
+model gmail_settings {
+  user_id              Int       @id
+  sync_enabled         Boolean   @default(false)
+  sync_since           DateTime? @db.Timestamptz(6)
+  last_synchronized_at DateTime? @db.Timestamptz(6)
+  users                users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_gmail_settings_user")
+}
+
+model oauth_states {
+  state      String   @id @db.VarChar(255)
+  user_id    Int
+  expires_at DateTime @db.Timestamptz(6)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_oauth_states_user")
 }

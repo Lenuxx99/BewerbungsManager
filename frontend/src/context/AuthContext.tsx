@@ -16,12 +16,11 @@ export interface User {
 interface AuthContextValue {
   user: User | null;
   refreshUser: () => Promise<boolean>;
-  loginWithGoogle: (credential: string) => Promise<boolean>;
   clearUser: () => void;
 }
 
 const API_URL =
-  import.meta.env.VITE_API_URL ?? "http://localhost:3000";
+  import.meta.env.APP_API_URL ?? "http://localhost:3000";
 
 const AuthContext = createContext<AuthContextValue | undefined>(
   undefined
@@ -70,43 +69,6 @@ export function AuthProvider({
     []
   );
 
-  const loginWithGoogle = useCallback(
-    async (credential: string): Promise<boolean> => {
-      try {
-        const response = await fetch(
-          `${API_URL}/api/auth/google`,
-          {
-            method: "POST",
-            credentials: "include",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              credential,
-            }),
-          }
-        );
-
-        if (!response.ok) {
-          setUser(null);
-          return false;
-        }
-
-        return await refreshUser();
-      } catch (error) {
-        console.error(
-          "Google-Anmeldung fehlgeschlagen:",
-          error
-        );
-
-        setUser(null);
-
-        return false;
-      }
-    },
-    [refreshUser]
-  );
-
   const clearUser = useCallback(() => {
     setUser(null);
   }, []);
@@ -116,7 +78,6 @@ export function AuthProvider({
       value={{
         user,
         refreshUser,
-        loginWithGoogle,
         clearUser,
       }}
     >

@@ -72,12 +72,12 @@ function ProtectedRoute() {
             sicher überprüft.
           </p>
 
-          <div
+          {/* <div
             className="auth-loading-progress"
             aria-hidden="true"
           >
             <span />
-          </div>
+          </div> */}
         </section>
       </main>
     );

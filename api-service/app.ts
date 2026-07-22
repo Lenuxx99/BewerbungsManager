@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import { errorMiddleware } from "./src/middleware/error.middleware";
 import { authRouter } from "./src/modules/auth/auth.routes";
 import { userRouter } from "./src/modules/user/user.routes";
+import { gmailRouter } from "./src/modules/gmail/gmail.routes";
 
 const app = express();
 
@@ -65,6 +66,8 @@ app.use("/api/auth", authRouter);
  */
 app.use("/api/user", userRouter);
 
+
+app.use("/api/gmail", gmailRouter);
 /*
  * Zentrale Fehlerbehandlung.
  * Sollte immer als letzte Middleware registriert werden.

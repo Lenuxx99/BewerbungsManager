@@ -12,7 +12,9 @@ import {
 } from "@react-oauth/google";
 
 import { useAuth } from "../context/AuthContext";
+
 import "../styles/ProtectedRoute.css";
+import "../styles/AuthPage.css";
 
 type AuthMode = "login" | "register";
 
@@ -198,14 +200,14 @@ function AuthPage() {
         );
       }
 
-      const isAuthenticated =
-        await refreshUser();
+      // const isAuthenticated =
+      //   await refreshUser();
 
-      if (!isAuthenticated) {
-        throw new Error(
-          "Die Google-Anmeldung konnte nicht bestätigt werden."
-        );
-      }
+      // if (!isAuthenticated) {
+      //   throw new Error(
+      //     "Die Google-Anmeldung konnte nicht bestätigt werden."
+      //   );
+      // }
 
       navigate("/dashboard", {
         replace: true,

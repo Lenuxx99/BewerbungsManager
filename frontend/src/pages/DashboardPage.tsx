@@ -1,4 +1,7 @@
-import { useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 import {
   Link,
   NavLink,
@@ -17,13 +20,18 @@ function DashboardPage() {
   const [logoutError, setLogoutError] =
     useState("");
 
+  const [gmailConnected, setGmailConnected] = useState(false);
+
+  const [isLoadingGmailStatus, setIsLoadingGmailStatus] = useState(true);
+
+  const [gmailStatusError, setGmailStatusError] = useState("");
   async function handleLogout() {
     setLogoutError("");
     setIsLoggingOut(true);
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/auth/logout",
+        `http://localhost:3000/api/auth/logout`,
         {
           method: "POST",
           credentials: "include",
@@ -57,6 +65,47 @@ function DashboardPage() {
   const initials = `${user?.first_name?.[0] ?? ""}${user?.last_name?.[0] ?? ""
     }`.toUpperCase() || "BM";
 
+
+  function connectGmail() {
+    window.location.href =
+      `http://localhost:3000/api/gmail/connect`;
+  }
+
+  useEffect(() => {
+    async function loadGmailStatus() {
+      try {
+        setGmailStatusError("");
+
+        const response = await fetch(
+          "http://localhost:3000/api/gmail/status",
+          {
+            method: "GET",
+            credentials: "include",
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "Gmail-Status konnte nicht geladen werden.",
+          );
+        }
+
+        const data = await response.json();
+
+        setGmailConnected(data.connected);
+      } catch (error) {
+        setGmailStatusError(
+          error instanceof Error
+            ? error.message
+            : "Unbekannter Fehler",
+        );
+      } finally {
+        setIsLoadingGmailStatus(false);
+      }
+    }
+
+    void loadGmailStatus();
+  }, []);
   return (
     <div className="dashboard-layout">
       <aside className="dashboard-sidebar">
@@ -361,20 +410,52 @@ function DashboardPage() {
 
         <section className="dashboard-panel processing-panel">
           <div>
-            <span className="processing-label">
-              Demnächst verfügbar
-            </span>
-
             <h2>
               Automatische E-Mail-Verarbeitung
             </h2>
 
-            <p>
+            <p style={{ marginBottom: "15px" }}>
               Eingehende Bewerbungs-E-Mails werden
               später automatisch analysiert,
               zugeordnet und als Statusänderung im
               Dashboard dargestellt.
             </p>
+            {isLoadingGmailStatus ? (
+              <p>Gmail-Status wird geprüft...</p>
+            ) : gmailConnected ? (
+              <div className="gmail-active-status">
+                <div className="gmail-status-header">
+                  <span className="gmail-status-dot"></span>
+
+                  <div>
+                    <strong>Gmail-Verarbeitung aktiv</strong>
+                    <p className="gmail-status-text">
+                      E-Mails werden automatisch im Hintergrund
+                      synchronisiert, analysiert und Bewerbungsjobs
+                      werden erkannt.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <button
+                className="empty-state-action"
+                style={{
+                  cursor: "pointer",
+                  border: "none",
+                }}
+                type="button"
+                onClick={connectGmail}
+              >
+                Gmail-Zugriff erlauben
+              </button>
+            )}
+
+            {gmailStatusError && (
+              <p className="gmail-error">
+                {gmailStatusError}
+              </p>
+            )}
           </div>
 
           <div className="processing-steps">
