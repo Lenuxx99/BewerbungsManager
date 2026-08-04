@@ -1,10 +1,9 @@
 import { Router } from "express";
 
 import { gmailController } from "./gmail.controller";
-import { authenticate } from "../../middleware/user.authentification";
+import { authenticate } from "../../middleware/auth.middleware";
 
 export const gmailRouter = Router();
-
 
 
 gmailRouter.get(

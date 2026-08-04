@@ -6,6 +6,7 @@ import { errorMiddleware } from "./src/middleware/error.middleware";
 import { authRouter } from "./src/modules/auth/auth.routes";
 import { userRouter } from "./src/modules/user/user.routes";
 import { gmailRouter } from "./src/modules/gmail/gmail.routes";
+import { appRouter } from "./src/modules/application/app.routes";
 
 const app = express();
 
@@ -68,6 +69,29 @@ app.use("/api/user", userRouter);
 
 
 app.use("/api/gmail", gmailRouter);
+
+
+/*
+ * Geschützte Bewerbungs-Routen.
+ *
+ * POST /api/applications/application
+ * Body:
+ * {
+ *   "firma": string,
+ *   "stelle": string,
+ *   "datum": string,      // Format: YYYY-MM-DD
+ *   "status": "OFFEN" | "INTERVIEW" | "ZUGESAGT" | "ABGESAGT",
+ *   "notizen"?: string
+ * }
+ *
+ *
+ * GET /api/applications/application
+ * Body: {}
+ *
+ * Liefert alle Bewerbungen des
+ * angemeldeten Benutzers zurück.
+ */
+app.use("/api/applications", appRouter);
 /*
  * Zentrale Fehlerbehandlung.
  * Sollte immer als letzte Middleware registriert werden.
