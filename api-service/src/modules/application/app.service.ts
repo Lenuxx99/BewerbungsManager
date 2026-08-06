@@ -30,5 +30,38 @@ export const appService = {
     } catch(error){
         throw new Error("Bewerbung konnte nicht abgefragt werden.");
     }
+  },
+
+  async deleteApp(appId: number){
+    try{
+      return await appRepository.deleteApplication(appId);
+    } catch(error){
+      throw new Error("Bewerbung konnte nicht gelöscht werden.");
+    }
+  },
+
+  async updateAppStatus(appId: number, status: ApplicationStatus){
+    try{
+      return await appRepository.updateApplication(appId, {status : status});
+    } catch(error){
+        throw new Error("Bewerbung konnte nicht updated werden.");
+    }
+  },
+
+  async updateAppNotizen (appId: number, notizen: string){
+    try {
+      return await appRepository.updateApplication(appId, {notizen: notizen})
+    } catch(error) {
+      throw new Error("Bewerbung konnte nicht updated werden.");
+    }
+  },
+
+  async updateAppInterviewDate (appId: number, interviewDate: string){
+    const parsedInterviewDate = new Date(interviewDate);
+    try {
+      return await appRepository.updateApplication(appId, {interview_date: parsedInterviewDate})
+    } catch(error) {
+      throw new Error("Bewerbung konnte nicht updated werden.");
+    }
   }
 };

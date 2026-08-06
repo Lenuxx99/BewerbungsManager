@@ -10,7 +10,7 @@ type ApplicationStatus =
   | "INTERVIEW"
   | "ZUGESAGT"
   | "ABGESAGT";
-  
+
 type DatabaseClient =
   | PrismaClient
   | Prisma.TransactionClient;
@@ -22,6 +22,7 @@ type CreateAppData = {
   datum: Date;
   status?: ApplicationStatus;
   notizen?: string;
+  interviewDate?: Date;
 };
 
 const appRepository = {
@@ -66,18 +67,20 @@ const appRepository = {
     });
   },
 
-  async updateStatus(
+  async updateApplication(
     id: number,
-    status: ApplicationStatus,
+    data: {
+      status?: string;
+      notizen?: string;
+      interview_date?: Date | null;
+    },
     db: DatabaseClient = prisma
   ) {
     return db.applications.update({
       where: {
         id,
       },
-      data: {
-        status,
-      },
+      data,
     });
   },
 

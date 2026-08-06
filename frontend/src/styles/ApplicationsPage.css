@@ -1,0 +1,534 @@
+.applications-add-button {
+  border: 0;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.applications-add-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+/* Fehler */
+
+.applications-error {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border: 1px solid #fecaca;
+  border-left: 5px solid #dc2626;
+  border-radius: 10px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Formular */
+
+.application-form-panel {
+  margin-bottom: 20px;
+}
+
+.application-close-button,
+.application-cancel-button {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #dbe1ea;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #475569;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.application-close-button:hover,
+.application-cancel-button:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.application-form {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.application-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.application-field span {
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.application-field input,
+.application-field select,
+.application-field textarea {
+  width: 100%;
+  border: 1px solid #dbe1ea;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #172033;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.application-field input,
+.application-field select {
+  min-height: 44px;
+  padding: 0 13px;
+}
+
+.application-field select {
+  cursor: pointer;
+}
+
+.application-field textarea {
+  min-height: 110px;
+  padding: 12px 13px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.application-field input::placeholder,
+.application-field textarea::placeholder {
+  color: #94a3b8;
+}
+
+.application-field input:focus,
+.application-field select:focus,
+.application-field textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgb(99 102 241 / 12%);
+}
+
+.application-notes-field {
+  grid-column: 1 / -1;
+}
+
+.application-form-actions {
+  grid-column: 1 / -1;
+  padding-top: 4px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Bewerbungsbereich */
+
+.applications-list-panel {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  cursor: default;
+}
+
+.applications-message {
+  margin: 24px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* Suche und Filter */
+
+.applications-toolbar {
+  margin: 22px 0 18px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px;
+  gap: 12px;
+}
+
+.applications-search input,
+.applications-filter select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #172033;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.applications-search input::placeholder {
+  color: #94a3b8;
+}
+
+.applications-search input:focus,
+.applications-filter select:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgb(79 70 229 / 14%);
+}
+
+.applications-filter select {
+  cursor: pointer;
+}
+
+/* Scrollbare Kartenliste */
+
+.applications-grid {
+  min-height: 0;
+  max-height: calc(100vh - 340px);
+  padding: 2px 6px 4px 2px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 14px;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.applications-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.applications-grid::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: #f1f5f9;
+}
+
+.applications-grid::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #cbd5e1;
+}
+
+.applications-grid::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Karte */
+
+.application-card {
+  min-width: 0;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  border: 1px solid #e6eaf0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgb(15 23 42 / 4%);
+  cursor: pointer;
+  transition:
+    transform 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.application-card:hover {
+  transform: translateY(-2px);
+  border-color: #c7d2fe;
+  box-shadow: 0 8px 22px rgb(15 23 42 / 8%);
+}
+
+.application-card:focus-visible {
+  border-color: #818cf8;
+  outline: 3px solid rgb(79 70 229 / 14%);
+  outline-offset: 2px;
+}
+
+.application-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.application-card-header > div {
+  min-width: 0;
+}
+
+.application-card-header h3 {
+  margin: 0;
+  overflow: hidden;
+  color: #172033;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.application-card-header p {
+  margin: 4px 0 0;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Status */
+
+.application-status {
+  min-width: 76px;
+  padding: 5px 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.application-status-offen {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.application-status-interview {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.application-status-zugesagt {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.application-status-abgesagt {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* Kartendetails */
+
+.application-details {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.application-dates {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.application-dates > div {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.application-dates > div:last-child {
+  text-align: right;
+}
+
+.application-details dt {
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.application-details dd {
+  margin: 0;
+  color: #475569;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.application-details > div:not(.application-dates) dd {
+  display: -webkit-box;
+  overflow: hidden;
+  white-space: pre-wrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* Aktionen */
+
+.application-card-actions {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #eef2f7;
+}
+
+.delete-button {
+  min-height: 32px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #94a3b8;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.delete-button:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.delete-button:active {
+  transform: scale(0.98);
+}
+
+.delete-button:focus-visible {
+  outline: 3px solid rgb(220 38 38 / 14%);
+  outline-offset: 2px;
+}
+
+/* Keine Suchergebnisse */
+
+.applications-no-results {
+  min-height: 260px;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.applications-no-results h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 17px;
+}
+
+.applications-no-results p {
+  margin: 9px 0 18px;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.secondary-action {
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid #c7d2fe;
+  border-radius: 9px;
+  background: #eef2ff;
+  color: #4338ca;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-action:hover {
+  background: #e0e7ff;
+}
+
+/* Accessibility */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Responsive */
+
+@media (max-width: 960px) {
+  .applications-grid {
+    grid-template-columns: 1fr;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .applications-list-panel {
+    overflow: visible;
+  }
+}
+
+@media (max-width: 760px) {
+  .application-form {
+    grid-template-columns: 1fr;
+  }
+
+  .application-notes-field,
+  .application-form-actions {
+    grid-column: auto;
+  }
+
+  .application-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .application-form-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 650px) {
+  .applications-toolbar {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .application-form-panel,
+  .applications-list-panel {
+    padding: 18px;
+  }
+
+  .application-card {
+    padding: 12px;
+  }
+
+  .application-card-header {
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .application-status {
+    min-width: 0;
+    align-self: flex-start;
+  }
+
+  .application-dates {
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .application-dates > div:last-child {
+    text-align: left;
+  }
+}

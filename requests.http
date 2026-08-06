@@ -1,0 +1,13 @@
+GET http://localhost:3000/api/applications
+
+###
+
+POST http://localhost:3000/api/applications
+Content-Type: application/json
+
+{
+    "firma": "BMW",
+    "stelle": "frontend Developer",
+    "datum": "08/09.2026",
+    "status": "offen"
+}

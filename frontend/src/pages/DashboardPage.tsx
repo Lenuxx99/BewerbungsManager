@@ -1,74 +1,64 @@
 import {
   useEffect,
   useState,
+  useCallback,
+  useDebugValue
 } from "react";
-import {
-  Link,
-  NavLink,
-  useNavigate,
-} from "react-router";
 
+import { Link } from "react-router";
+
+import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
+
 import "../styles/DashboardPage.css";
 
+type ApplicationStatus =
+  | "OFFEN"
+  | "INTERVIEW"
+  | "ZUGESAGT"
+  | "ABGESAGT";
+
+type ApplicationsType = {
+  id: number;
+  firma: string;
+  stelle: string;
+  datum: string;
+  status: ApplicationStatus;
+  notizen?: string;
+};
+
+type ErrorResponse = {
+  message?: string;
+};
+const API_URL = "http://localhost:3000/api";
 function DashboardPage() {
-  const { user, clearUser } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const [isLoggingOut, setIsLoggingOut] =
+  const [applications, setApplications] = useState<ApplicationsType[]>([])
+
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] =
+    useState(true);
+
+  const [gmailConnected, setGmailConnected] =
     useState(false);
-  const [logoutError, setLogoutError] =
-    useState("");
 
-  const [gmailConnected, setGmailConnected] = useState(false);
+  const [
+    isLoadingGmailStatus,
+    setIsLoadingGmailStatus,
+  ] = useState(true);
 
-  const [isLoadingGmailStatus, setIsLoadingGmailStatus] = useState(true);
-
-  const [gmailStatusError, setGmailStatusError] = useState("");
-  async function handleLogout() {
-    setLogoutError("");
-    setIsLoggingOut(true);
-
-    try {
-      const response = await fetch(
-        `http://localhost:3000/api/auth/logout`,
-        {
-          method: "POST",
-          credentials: "include",
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Logout fehlgeschlagen.");
-      }
-
-      clearUser();
-
-      navigate("/", {
-        replace: true,
-      });
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "Beim Logout ist ein Fehler aufgetreten.";
-
-      setLogoutError(message);
-    } finally {
-      setIsLoggingOut(false);
-    }
-  }
+  const [
+    gmailStatusError,
+    setGmailStatusError,
+  ] = useState("");
 
   const displayName =
     user?.first_name?.trim() || "Benutzer";
 
-  const initials = `${user?.first_name?.[0] ?? ""}${user?.last_name?.[0] ?? ""
-    }`.toUpperCase() || "BM";
-
-
   function connectGmail() {
     window.location.href =
-      `http://localhost:3000/api/gmail/connect`;
+      `${API_URL}/gmail/connect`;
   }
 
   useEffect(() => {
@@ -77,16 +67,16 @@ function DashboardPage() {
         setGmailStatusError("");
 
         const response = await fetch(
-          "http://localhost:3000/api/gmail/status",
+          `${API_URL}/gmail/status`,
           {
             method: "GET",
             credentials: "include",
-          },
+          }
         );
 
         if (!response.ok) {
           throw new Error(
-            "Gmail-Status konnte nicht geladen werden.",
+            "Gmail-Status konnte nicht geladen werden."
           );
         }
 
@@ -94,11 +84,12 @@ function DashboardPage() {
 
         setGmailConnected(data.connected);
       } catch (error) {
-        setGmailStatusError(
+        const message =
           error instanceof Error
             ? error.message
-            : "Unbekannter Fehler",
-        );
+            : "Unbekannter Fehler";
+
+        setGmailStatusError(message);
       } finally {
         setIsLoadingGmailStatus(false);
       }
@@ -106,114 +97,77 @@ function DashboardPage() {
 
     void loadGmailStatus();
   }, []);
+
+  const interviewCount = applications.filter(
+    (e) => e.status === "INTERVIEW"
+  ).length;
+
+  const latestApplications = [...applications]
+    .sort(
+      (a, b) =>
+        new Date(b.datum).getTime() - new Date(a.datum).getTime()
+    )
+    .slice(0, 4);
+
+  const loadApplications = useCallback(
+    async () => {
+      try {
+        setError("");
+        setIsLoading(true);
+
+        const response = await fetch(
+          `${API_URL}/applications`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          const errorData =
+            data as ErrorResponse;
+
+          setError(
+            errorData.message ??
+            "Bewerbungen konnten nicht geladen werden."
+          );
+
+          return;
+        }
+
+        setApplications(
+          data as ApplicationsType[]
+        );
+      } catch (error) {
+        console.error(error);
+
+        setError(
+          "Der Server ist nicht erreichbar."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    []
+  );
+
+  useEffect(() => {
+    void loadApplications();
+  }, [loadApplications]);
+
+  function formatDate(date: string) {
+    return new Intl.DateTimeFormat("de-DE", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(new Date(date));
+  }
+
   return (
     <div className="dashboard-layout">
-      <aside className="dashboard-sidebar">
-        <div>
-          <Link
-            to="/dashboard"
-            className="dashboard-brand"
-          >
-            <span className="brand-icon">BM</span>
-
-            <span>
-              <strong>Bewerbungsmanager</strong>
-              <small>Dein Karriere-Dashboard</small>
-            </span>
-          </Link>
-
-          <nav className="dashboard-navigation">
-            <NavLink
-              to="/dashboard"
-              end
-              className={({ isActive }) =>
-                isActive
-                  ? "navigation-link active"
-                  : "navigation-link"
-              }
-            >
-              <span className="navigation-icon">
-                ◫
-              </span>
-              Übersicht
-            </NavLink>
-
-            <NavLink
-              to="/applications"
-              className={({ isActive }) =>
-                isActive
-                  ? "navigation-link active"
-                  : "navigation-link"
-              }
-            >
-              <span className="navigation-icon">
-                ◧
-              </span>
-              Bewerbungen
-            </NavLink>
-
-            <button
-              type="button"
-              className="navigation-link navigation-button"
-              disabled
-            >
-              <span className="navigation-icon">
-                ✉
-              </span>
-              E-Mail-Verarbeitung
-              <span className="navigation-badge">
-                Bald
-              </span>
-            </button>
-
-            <button
-              type="button"
-              className="navigation-link navigation-button"
-              disabled
-            >
-              <span className="navigation-icon">
-                ◷
-              </span>
-              Termine
-              <span className="navigation-badge">
-                Bald
-              </span>
-            </button>
-          </nav>
-        </div>
-
-        <div className="sidebar-footer">
-          <div className="sidebar-user">
-            <div className="user-avatar">
-              {initials}
-            </div>
-
-            <div className="sidebar-user-info">
-              <strong>
-                {user?.first_name} {user?.last_name}
-              </strong>
-              <span>{user?.email}</span>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="logout-button"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-          >
-            {isLoggingOut
-              ? "Wird abgemeldet..."
-              : "Abmelden"}
-          </button>
-
-          {logoutError && (
-            <p className="logout-error">
-              {logoutError}
-            </p>
-          )}
-        </div>
-      </aside>
+      <Sidebar />
 
       <main className="dashboard-main">
         <header className="dashboard-header">
@@ -227,20 +181,24 @@ function DashboardPage() {
             </h1>
 
             <p className="dashboard-subtitle">
-              Hier erhältst du später einen
-              vollständigen Überblick über deine
-              Bewerbungen und eingehenden E-Mails.
+              Hier erhältst du einen vollständigen
+              Überblick über deine Bewerbungen und
+              eingehenden E-Mails.
             </p>
           </div>
 
-          <Link
+          {/* <Link
             to="/applications"
             className="primary-action"
           >
             Bewerbung hinzufügen
-          </Link>
+          </Link> */}
         </header>
-
+        {error && (
+          <div className="dashboard-error" role="alert">
+            {error}
+          </div>
+        )}
         <section
           className="statistics-grid"
           aria-label="Bewerbungsstatistiken"
@@ -250,18 +208,24 @@ function DashboardPage() {
               <span className="statistic-icon">
                 ◧
               </span>
+
               <span className="statistic-label">
                 Bewerbungen
               </span>
             </div>
-
-            <strong className="statistic-value">
-              0
-            </strong>
-
-            <p>
-              Noch keine Bewerbungen erfasst
-            </p>
+            {applications.length > 0 ? (
+              <div>
+                <strong className="statistic-value">
+                  {applications.length}
+                </strong>
+                <p>Bewerbungen erfasst</p>
+              </div>
+            ) : (
+              <div>
+                <strong className="statistic-value">0</strong>
+                <p>Noch keine Bewerbungen erfasst</p>
+              </div>
+            )}
           </article>
 
           <article className="statistic-card">
@@ -269,6 +233,7 @@ function DashboardPage() {
               <span className="statistic-icon">
                 ✉
               </span>
+
               <span className="statistic-label">
                 Neue Nachrichten
               </span>
@@ -279,28 +244,43 @@ function DashboardPage() {
             </strong>
 
             <p>
-              Wird durch E-Mail-Processing
+              Wird durch E-Mail-Verarbeitung
               aktualisiert
             </p>
           </article>
 
           <article className="statistic-card">
             <div className="statistic-card-header">
-              <span className="statistic-icon">
-                ✓
-              </span>
+              <span className="statistic-icon">✓</span>
+
               <span className="statistic-label">
                 Einladungen
               </span>
             </div>
 
-            <strong className="statistic-value">
-              0
-            </strong>
+            {interviewCount > 0 ? (
+              <div>
+                <strong className="statistic-value">
+                  {interviewCount}
+                </strong>
 
-            <p>
-              Noch keine Gespräche geplant
-            </p>
+                <p>
+                  {interviewCount === 1
+                    ? "Gespräch geplant"
+                    : "Gespräche geplant"}
+                </p>
+              </div>
+            ) : (
+              <div>
+                <strong className="statistic-value">
+                  0
+                </strong>
+
+                <p>
+                  Noch keine Gespräche geplant
+                </p>
+              </div>
+            )}
           </article>
 
           <article className="statistic-card">
@@ -308,6 +288,7 @@ function DashboardPage() {
               <span className="statistic-icon">
                 ◷
               </span>
+
               <span className="statistic-label">
                 Offene Aufgaben
               </span>
@@ -328,6 +309,7 @@ function DashboardPage() {
             <div className="panel-header">
               <div>
                 <h2>Letzte Bewerbungen</h2>
+
                 <p>
                   Deine zuletzt bearbeiteten
                   Bewerbungen erscheinen hier.
@@ -341,35 +323,68 @@ function DashboardPage() {
                 Alle ansehen
               </Link>
             </div>
+            {applications.length > 0 ? (
+              <div className="recent-applications">
+                {latestApplications.map((application) => (
+                  <div
+                    key={application.id}
+                    className="recent-application"
+                  >
+                    <div className="recent-application-content">
+                      <div className="recent-application-icon">
+                        ◧
+                      </div>
 
-            <div className="empty-state">
-              <div className="empty-state-icon">
-                ◧
+                      <div className="recent-application-info">
+                        <h4>{application.stelle}</h4>
+                        <p>{application.firma}</p>
+                      </div>
+                    </div>
+
+                    <div className="recent-application-meta">
+                      <span className="application-date">
+                        {formatDate(application.datum)}
+                      </span>
+
+                      <span
+                        className={`application-status ${application.status?.toLowerCase() ?? ""
+                          }`}
+                      >
+                        {application.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
+            ) : (
+              <div className="empty-state">
+                <div className="empty-state-icon">
+                  ◧
+                </div>
 
-              <h3>
-                Noch keine Bewerbungen vorhanden
-              </h3>
+                <h3>Noch keine Bewerbungen vorhanden</h3>
 
-              <p>
-                Sobald du Bewerbungen hinzufügst
-                oder E-Mails verarbeitet werden,
-                erscheinen sie an dieser Stelle.
-              </p>
+                <p>
+                  Sobald du Bewerbungen hinzufügst oder E-Mails verarbeitet werden,
+                  erscheinen sie an dieser Stelle.
+                </p>
 
-              <Link
-                to="/applications"
-                className="empty-state-action"
-              >
-                Erste Bewerbung anlegen
-              </Link>
-            </div>
+                <Link
+                  to="/applications"
+                  className="empty-state-action"
+                >
+                  Erste Bewerbung anlegen
+                </Link>
+              </div>
+            )}
+
           </article>
 
           <aside className="dashboard-panel activity-panel">
             <div className="panel-header">
               <div>
                 <h2>Aktivitäten</h2>
+
                 <p>
                   Automatisch erkannte Ereignisse
                 </p>
@@ -382,8 +397,9 @@ function DashboardPage() {
 
                 <div>
                   <strong>
-                    E-Mail-Processing vorbereiten
+                    E-Mail-Verarbeitung vorbereiten
                   </strong>
+
                   <p>
                     Nach der Integration erscheinen
                     hier neue Statusänderungen.
@@ -398,6 +414,7 @@ function DashboardPage() {
                   <strong>
                     Noch keine Aktivitäten
                   </strong>
+
                   <p>
                     Neue Ereignisse werden
                     automatisch eingetragen.
@@ -416,22 +433,29 @@ function DashboardPage() {
 
             <p style={{ marginBottom: "15px" }}>
               Eingehende Bewerbungs-E-Mails werden
-              später automatisch analysiert,
-              zugeordnet und als Statusänderung im
-              Dashboard dargestellt.
+              automatisch analysiert, zugeordnet
+              und als Statusänderung im Dashboard
+              dargestellt.
             </p>
+
             {isLoadingGmailStatus ? (
-              <p>Gmail-Status wird geprüft...</p>
+              <p>
+                Gmail-Status wird geprüft...
+              </p>
             ) : gmailConnected ? (
               <div className="gmail-active-status">
                 <div className="gmail-status-header">
-                  <span className="gmail-status-dot"></span>
+                  <span className="gmail-status-dot" />
 
                   <div>
-                    <strong>Gmail-Verarbeitung aktiv</strong>
+                    <strong>
+                      Gmail-Verarbeitung aktiv
+                    </strong>
+
                     <p className="gmail-status-text">
-                      E-Mails werden automatisch im Hintergrund
-                      synchronisiert, analysiert und Bewerbungsjobs
+                      E-Mails werden automatisch im
+                      Hintergrund synchronisiert,
+                      analysiert und Bewerbungsjobs
                       werden erkannt.
                     </p>
                   </div>
@@ -475,8 +499,8 @@ function DashboardPage() {
             </div>
           </div>
         </section>
-      </main>
-    </div>
+      </main >
+    </div >
   );
 }
 

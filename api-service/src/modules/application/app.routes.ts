@@ -6,6 +6,8 @@ import { applicationSchema } from "./app.schema";
 import {
   createApplication,
   getApplications,
+  deleteApplication,
+  updateApplication
 } from "./app.controller";
 
 export const appRouter = Router();
@@ -21,4 +23,17 @@ appRouter.get(
   "/",
   authenticate,
   getApplications
+);
+
+
+appRouter.delete(
+  "/:appId",
+  authenticate,
+  deleteApplication,
+);
+
+appRouter.patch(
+  "/:appId",
+  authenticate,
+  updateApplication,
 );

@@ -31,11 +31,13 @@ app.use(
  */
 app.use(cookieParser());
 
+
 /*
  * Wandelt JSON aus dem Request Body
  * in ein JavaScript-Objekt um.
  */
 app.use(express.json());
+
 
 /*
  * Öffentliche Auth-Routen.
@@ -59,6 +61,7 @@ app.use(express.json());
  */
 app.use("/api/auth", authRouter);
 
+
 /*
  * Geschützte User-Routen.
  *
@@ -68,13 +71,10 @@ app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 
 
-app.use("/api/gmail", gmailRouter);
-
-
 /*
  * Geschützte Bewerbungs-Routen.
  *
- * POST /api/applications/application
+ * POST /api/applications
  * Body:
  * {
  *   "firma": string,
@@ -84,14 +84,33 @@ app.use("/api/gmail", gmailRouter);
  *   "notizen"?: string
  * }
  *
- *
- * GET /api/applications/application
+ * GET /api/applications
  * Body: {}
  *
  * Liefert alle Bewerbungen des
  * angemeldeten Benutzers zurück.
+ *
+ * DELETE /api/applications/:appId
+ * Body: {}
+ *
+ * Löscht die Bewerbung mit der
+ * angegebenen ID.
+ *
+ * PATCH /api/applications/:appId
+ * Body:
+ * {
+ *   "status": "OFFEN" | "INTERVIEW" | "ZUGESAGT" | "ABGESAGT"
+ * }
+ *
+ * Aktualisiert den Status der
+ * angegebenen Bewerbung.
  */
 app.use("/api/applications", appRouter);
+
+
+app.use("/api/gmail", gmailRouter);
+
+
 /*
  * Zentrale Fehlerbehandlung.
  * Sollte immer als letzte Middleware registriert werden.

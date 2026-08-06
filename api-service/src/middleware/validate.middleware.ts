@@ -25,7 +25,7 @@ export function validate(schema: ZodTypeAny) {
 
     if (!result.success) {
       res.status(400).json({
-        message: "Validierungsfehler",
+        message: "Bitte überprüfe deine Eingaben.",
         errors: z.treeifyError(result.error),
       });
 
