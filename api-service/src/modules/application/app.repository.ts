@@ -23,6 +23,7 @@ type CreateAppData = {
   status?: ApplicationStatus;
   notizen?: string;
   interviewDate?: Date;
+  interviewNotizen?: string
 };
 
 const appRepository = {
@@ -67,12 +68,28 @@ const appRepository = {
     });
   },
 
+  async findInterviewAppsByUserId(
+    userId: number,
+    db: DatabaseClient = prisma
+  ) {
+    return db.applications.findMany({
+      where: {
+        user_id: userId,
+        status: "INTERVIEW",
+      },
+      orderBy: {
+        interview_date: "asc",
+      },
+    });
+  }, 
+
   async updateApplication(
     id: number,
     data: {
       status?: string;
       notizen?: string;
       interview_date?: Date | null;
+      interview_notizen?: string
     },
     db: DatabaseClient = prisma
   ) {

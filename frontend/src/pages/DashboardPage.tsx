@@ -2,13 +2,13 @@ import {
   useEffect,
   useState,
   useCallback,
-  useDebugValue
 } from "react";
 
 import { Link } from "react-router";
 
 import Sidebar from "../components/Sidebar";
 import { useAuth } from "../context/AuthContext";
+import { DailyApplications, getTodayApplicationsCount } from "../components/DailyApplications";
 
 import "../styles/DashboardPage.css";
 
@@ -164,7 +164,17 @@ function DashboardPage() {
       year: "numeric",
     }).format(new Date(date));
   }
+  const DAILY_GOAL = 5;
 
+  const applicationsToday =
+    getTodayApplicationsCount(applications);
+
+  const hasOpenDailyTask =
+    applicationsToday < DAILY_GOAL;
+
+  const openApplications = applications.filter(
+    (app) => app.status === "OFFEN"
+  ).length;
   return (
     <div className="dashboard-layout">
       <Sidebar />
@@ -231,21 +241,20 @@ function DashboardPage() {
           <article className="statistic-card">
             <div className="statistic-card-header">
               <span className="statistic-icon">
-                ✉
+                ◷
               </span>
 
               <span className="statistic-label">
-                Neue Nachrichten
+                Offene Bewerbungen
               </span>
             </div>
 
             <strong className="statistic-value">
-              0
+              {openApplications}
             </strong>
 
             <p>
-              Wird durch E-Mail-Verarbeitung
-              aktualisiert
+              Bewerbungen ohne Entscheidung
             </p>
           </article>
 
@@ -295,11 +304,13 @@ function DashboardPage() {
             </div>
 
             <strong className="statistic-value">
-              0
+              {hasOpenDailyTask ? 1 : 0}
             </strong>
 
             <p>
-              Keine ausstehenden Aktionen
+              {hasOpenDailyTask
+                ? `Tagesziel: ${applicationsToday}/${DAILY_GOAL} Bewerbungen`
+                : "Keine ausstehenden Aktionen"}
             </p>
           </article>
         </section>
@@ -380,52 +391,25 @@ function DashboardPage() {
 
           </article>
 
-          <aside className="dashboard-panel activity-panel">
+          <section className="dashboard-panel activity-panel">
             <div className="panel-header">
               <div>
-                <h2>Aktivitäten</h2>
-
-                <p>
-                  Automatisch erkannte Ereignisse
-                </p>
+                <h2>Aktivität</h2>
+                <p>Dein Bewerbungsfortschritt heute.</p>
               </div>
             </div>
 
-            <div className="activity-list">
-              <div className="activity-item">
-                <div className="activity-dot" />
+            <DailyApplications
+              apps={applications}
+              dailyGoal={5}
+              variant="panel"
+            />
 
-                <div>
-                  <strong>
-                    E-Mail-Verarbeitung vorbereiten
-                  </strong>
-
-                  <p>
-                    Nach der Integration erscheinen
-                    hier neue Statusänderungen.
-                  </p>
-                </div>
-              </div>
-
-              <div className="activity-item muted">
-                <div className="activity-dot" />
-
-                <div>
-                  <strong>
-                    Noch keine Aktivitäten
-                  </strong>
-
-                  <p>
-                    Neue Ereignisse werden
-                    automatisch eingetragen.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </aside>
+            {/* deine weiteren Activity Elemente */}
+          </section>
         </section>
 
-        <section className="dashboard-panel processing-panel">
+        {/* <section className="dashboard-panel processing-panel">
           <div>
             <h2>
               Automatische E-Mail-Verarbeitung
@@ -498,7 +482,7 @@ function DashboardPage() {
               Bewerbung aktualisieren
             </div>
           </div>
-        </section>
+        </section> */}
       </main >
     </div >
   );

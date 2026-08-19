@@ -7,7 +7,8 @@ import {
   createApplication,
   getApplications,
   deleteApplication,
-  updateApplication
+  updateApplication,
+  getApplicationsWithInterview
 } from "./app.controller";
 
 export const appRouter = Router();
@@ -36,4 +37,10 @@ appRouter.patch(
   "/:appId",
   authenticate,
   updateApplication,
+);
+
+appRouter.get(
+  "/termine",
+  authenticate,
+  getApplicationsWithInterview,
 );

@@ -278,38 +278,43 @@
 }
 
 /* Status */
-
 .application-status {
   min-width: 76px;
-  padding: 5px 9px;
+  padding: 7px 10px;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+
   border-radius: 999px;
-  font-size: 10px;
+
+  font-size: 11px;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: capitalize;
   white-space: nowrap;
 }
 
-.application-status-offen {
+/* OFFEN */
+.application-status.application-status-offen {
   background: #eef2ff;
   color: #4338ca;
 }
 
-.application-status-interview {
+/* INTERVIEW */
+.application-status.application-status-interview {
   background: #fff7ed;
   color: #c2410c;
 }
 
-.application-status-zugesagt {
+/* ZUGESAGT */
+.application-status.application-status-zugesagt {
   background: #f0fdf4;
   color: #15803d;
 }
 
-.application-status-abgesagt {
+/* ABGESAGT */
+.application-status.application-status-abgesagt {
   background: #fef2f2;
   color: #b91c1c;
 }
@@ -362,7 +367,6 @@
   overflow: hidden;
   white-space: pre-wrap;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
 
 /* Aktionen */

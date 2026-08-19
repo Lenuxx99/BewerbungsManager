@@ -1,0 +1,171 @@
+.daily-applications {
+  padding: 18px;
+
+  border: 1px solid #e6eaf0;
+  border-radius: 14px;
+
+  background: #ffffff;
+}
+
+.daily-applications-popup {
+  position: fixed;
+
+  right: 24px;
+  bottom: 24px;
+
+  width: 285px;
+
+  z-index: 1000;
+
+  box-shadow:
+    0 14px 35px rgb(15 23 42 / 12%),
+    0 3px 8px rgb(15 23 42 / 5%);
+
+  animation: dailyGoalPopup 0.3s ease;
+}
+
+.daily-applications-panel {
+  margin-top: 20px;
+
+  background: #fafbff;
+}
+
+.daily-applications-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.daily-applications-icon {
+  width: 42px;
+  height: 42px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: #eef2ff;
+  color: #4f46e5;
+
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.daily-applications-label {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.daily-applications-header strong {
+  color: #172033;
+
+  font-size: 13px;
+}
+
+.daily-applications-count {
+  margin-top: 18px;
+
+  display: flex;
+  align-items: baseline;
+
+  gap: 5px;
+}
+
+.daily-applications-count strong {
+  color: #172033;
+
+  font-size: 30px;
+  line-height: 1;
+}
+
+.daily-applications-count span {
+  color: #94a3b8;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.daily-progress {
+  height: 7px;
+
+  margin-top: 13px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: #eef2ff;
+}
+
+.daily-progress-value {
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: #4f46e5;
+
+  transition: width 0.35s ease;
+}
+
+.daily-applications-message {
+  margin: 10px 0 0;
+
+  color: #64748b;
+
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.daily-applications-complete {
+  border-color: #bbf7d0;
+}
+
+.daily-applications-complete
+.daily-applications-icon {
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.daily-applications-complete
+.daily-progress {
+  background: #dcfce7;
+}
+
+.daily-applications-complete
+.daily-progress-value {
+  background: #16a34a;
+}
+
+@keyframes dailyGoalPopup {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 760px) {
+  .daily-applications-popup {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+
+    width: auto;
+  }
+}

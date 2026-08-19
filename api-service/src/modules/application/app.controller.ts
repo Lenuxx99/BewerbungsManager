@@ -4,82 +4,82 @@ import type { ApplicationInput } from "./app.schema";
 
 
 export async function createApplication(
-    req: Request<{}, {}, ApplicationInput>,
-    res: Response,
-    next: NextFunction
+  req: Request<{}, {}, ApplicationInput>,
+  res: Response,
+  next: NextFunction
 ) {
-    const userId = req.userId;
+  const userId = req.userId;
 
-    if (!userId) {
-        return res.status(401).json({
-            message: "Nicht authentifiziert.",
-        });
-    }
+  if (!userId) {
+    return res.status(401).json({
+      message: "Nicht authentifiziert.",
+    });
+  }
 
-    const appData = {
-        ...req.body,
-        userId,
-        datum: new Date(req.body.datum),
-    };
+  const appData = {
+    ...req.body,
+    userId,
+    datum: new Date(req.body.datum),
+  };
 
-    try {
-        const createdApp = await appService.addApp(appData);
+  try {
+    const createdApp = await appService.addApp(appData);
 
-        return res.status(201).json({
-            message: "Bewerbung erfolgreich gespeichert.",
-            application: createdApp,
-        });
-    } catch (error) {
-        return next(error);
-    }
+    return res.status(201).json({
+      message: "Bewerbung erfolgreich gespeichert.",
+      application: createdApp,
+    });
+  } catch (error) {
+    return next(error);
+  }
 }
 
 export async function getApplications(
-    req: Request,
-    res: Response,
-    next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) {
-    const userId = req.userId;
+  const userId = req.userId;
 
-    if (!userId) {
-        return res.status(400).json({
-            message: "Ungültige userId.",
-        });
-    }
+  if (!userId) {
+    return res.status(400).json({
+      message: "Ungültige userId.",
+    });
+  }
 
-    try {
-        const applications = await appService.getApps(userId);
+  try {
+    const applications = await appService.getApps(userId);
 
-        res.status(200).json(
-            applications
-        )
-    } catch (error) {
-        return next(error);
-    }
+    res.status(200).json(
+      applications
+    )
+  } catch (error) {
+    return next(error);
+  }
 }
 
 export async function deleteApplication(
-    req: Request,
-    res: Response,
-    next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) {
-    const appId = Number(req.params.appId);
+  const appId = Number(req.params.appId);
 
-    if (!appId) {
-        return res.status(400).json({
-            message: "Eine gültige Bewerbungs-ID ist erforderlich.",
-        });
-    }
+  if (!appId) {
+    return res.status(400).json({
+      message: "Eine gültige Bewerbungs-ID ist erforderlich.",
+    });
+  }
 
-    try {
-        await appService.deleteApp(appId);
+  try {
+    await appService.deleteApp(appId);
 
-        return res.status(200).json({
-            message: "Application wurde erfolgreich entfernt"
-        })
-    } catch (error) {
-        next(error);
-    }
+    return res.status(200).json({
+      message: "Application wurde erfolgreich entfernt"
+    })
+  } catch (error) {
+    next(error);
+  }
 }
 
 export async function updateApplication(
@@ -93,8 +93,10 @@ export async function updateApplication(
     status,
     notizen,
     interview_date,
+    interview_notizen
   } = req.body;
-
+  console.log(notizen)
+  console.log(interview_date)
   try {
     if (!Number.isInteger(appId) || appId <= 0) {
       return res.status(400).json({
@@ -105,7 +107,8 @@ export async function updateApplication(
     if (
       status === undefined &&
       notizen === undefined &&
-      interview_date === undefined
+      interview_date === undefined &&
+      interview_notizen === undefined
     ) {
       return res.status(400).json({
         message:
@@ -132,10 +135,26 @@ export async function updateApplication(
     }
 
     if (interview_date !== undefined) {
+      const interviewDate = new Date(interview_date);
+      const today = new Date();
+
+      if (interviewDate < today) {
+        return res.status(400).json({
+          message: "Das Interview-Datum darf nicht in der Vergangenheit liegen."
+        });
+      }
       application =
         await appService.updateAppInterviewDate(
           appId,
           interview_date
+        );
+    }
+
+    if (interview_notizen !== undefined) {
+      application =
+        await appService.updateInterviewAppNotizen(
+          appId,
+          interview_notizen
         );
     }
 
@@ -144,6 +163,30 @@ export async function updateApplication(
         "Bewerbung wurde erfolgreich aktualisiert.",
       application,
     });
+  } catch (error) {
+    next(error)
+  }
+}
+
+export async function getApplicationsWithInterview(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.userId;
+
+  if (!userId) {
+    return res.status(401).json({
+      message: "Nicht authentifiziert.",
+    });
+  }
+
+  try {
+    const apps = await appService.getInterviewApp(userId);
+
+    return res.status(200).json(
+      apps,
+    );
   } catch (error) {
     next(error);
   }

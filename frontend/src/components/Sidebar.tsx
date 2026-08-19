@@ -19,9 +19,8 @@ function Sidebar() {
     useState("");
 
   const initials =
-    `${user?.first_name?.[0] ?? ""}${
-      user?.last_name?.[0] ?? ""
-    }`.toUpperCase() || "BM";
+    `${user?.first_name?.[0] ?? ""}${user?.last_name?.[0] ?? ""
+      }`.toUpperCase() || "BM";
 
   async function handleLogout() {
     setLogoutError("");
@@ -105,8 +104,22 @@ function Sidebar() {
 
             Bewerbungen
           </NavLink>
+          <NavLink
+            to="/termine"
+            className={({ isActive }) =>
+              isActive
+                ? "navigation-link active"
+                : "navigation-link"
+            }
+          >
+            <span className="navigation-icon">
+              ◷
+            </span>
 
-          <button
+            Termine
+
+          </NavLink>
+          {/* <button
             type="button"
             className="navigation-link navigation-button"
             disabled
@@ -120,23 +133,9 @@ function Sidebar() {
             <span className="navigation-badge">
               Bald
             </span>
-          </button>
+          </button> */}
 
-          <button
-            type="button"
-            className="navigation-link navigation-button"
-            disabled
-          >
-            <span className="navigation-icon">
-              ◷
-            </span>
 
-            Termine
-
-            <span className="navigation-badge">
-              Bald
-            </span>
-          </button>
         </nav>
       </div>
 

@@ -4,6 +4,7 @@ import AuthPage from "./pages/AuthPage";
 import DashboardPage from "./pages/DashboardPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import TerminePage from "./pages/TerminePage";
 // import ApplicationDetailsPage from "./components/ApplicationDetails";
 
 
@@ -21,6 +22,10 @@ function App() {
         <Route
           path="/applications"
           element={<ApplicationsPage />}
+        />
+        <Route
+          path="/termine"
+          element={<TerminePage />}
         />
         {/* <Route
           path="/applications/:id"

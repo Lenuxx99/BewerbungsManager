@@ -6,8 +6,8 @@ import {
 
 import Sidebar from "../components/Sidebar";
 import ApplicationDetails from "../components/ApplicationDetails";
-import "../styles/DashboardPage.css";
 import "../styles/ApplicationsPage.css";
+import {DailyApplications} from "../components/DailyApplications";
 
 type ApplicationStatus =
     | "OFFEN"
@@ -69,6 +69,7 @@ export default function ApplicationsPage() {
     const [statusFilter, setStatusFilter] =
         useState<ApplicationStatus | "ALLE">("ALLE");
 
+    const [showDailyGoal, setShowDailyGoal] = useState(false);
     const loadApplications = useCallback(
         async () => {
             try {
@@ -145,6 +146,7 @@ export default function ApplicationsPage() {
         try {
             setError("");
             setIsCreatingApplication(true);
+
             const response = await fetch(
                 `${API_URL}/applications`,
                 {
@@ -158,7 +160,8 @@ export default function ApplicationsPage() {
                         stelle: stelle.trim(),
                         datum,
                         status,
-                        notizen: notizen.trim() || undefined,
+                        notizen:
+                            notizen.trim() || undefined,
                     }),
                 }
             );
@@ -180,7 +183,25 @@ export default function ApplicationsPage() {
             resetForm();
             setShowApplicationForm(false);
 
+            /*
+                Bewerbungen neu laden,
+                damit DailyApplications den
+                aktuellen Wert bekommt.
+            */
             await loadApplications();
+
+            /*
+                Daily-Goal Popup anzeigen.
+            */
+            setShowDailyGoal(true);
+
+            /*
+                Nach 4 Sekunden wieder ausblenden.
+            */
+            setTimeout(() => {
+                setShowDailyGoal(false);
+            }, 4000);
+
         } catch (error) {
             console.error(error);
 
@@ -313,7 +334,12 @@ export default function ApplicationsPage() {
     return (
         <div className="dashboard-layout">
             <Sidebar />
-
+            <DailyApplications
+                apps={applications}
+                dailyGoal={5}
+                variant="popup"
+                visible={showDailyGoal}
+            />
             <main className="dashboard-main">
                 <header className="dashboard-header">
                     <div>
