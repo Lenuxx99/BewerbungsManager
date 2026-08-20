@@ -7,34 +7,38 @@ import {
     beforeEach,
 } from "vitest";
 
-let app: typeof import("../../../../app").app;
-let prisma: typeof import("../../../../infrastructure/database/prisma").prisma;
-
 import {
     startTestDatabase,
     stopTestDatabase,
 } from "../../../../test/integration/setup";
 
-import { userService } from "../../user.service";
+let prisma: typeof import(
+    "../../../../infrastructure/database/prisma"
+).prisma;
+
+let userService: typeof import("../../user.service").userService;
 
 describe("user Integration", () => {
 
     beforeAll(async () => {
         await startTestDatabase();
 
-        const appModule = await import("../../../../app");
-        app = appModule.app;
-
         const prismaModule = await import(
             "../../../../infrastructure/database/prisma"
         );
+
         prisma = prismaModule.prisma;
+
+        const userServiceModule = await import(
+            "../../user.service"
+        );
+
+        userService = userServiceModule.userService;
     }, 60_000);
 
 
     beforeEach(async () => {
         await prisma.applications.deleteMany();
-
         await prisma.user_credentials.deleteMany();
         await prisma.oauth_accounts.deleteMany();
         await prisma.users.deleteMany();
