@@ -1,40 +1,50 @@
 import {
-  describe,
-  it,
-  expect,
-  beforeAll,
-  afterAll,
-  beforeEach,
+    describe,
+    it,
+    expect,
+    beforeAll,
+    afterAll,
+    beforeEach,
 } from "vitest";
 
+let app: typeof import("../../../../app").app;
+let prisma: typeof import("../../../../infrastructure/database/prisma").prisma;
+
 import {
-  startTestDatabase,
-  stopTestDatabase,
+    startTestDatabase,
+    stopTestDatabase,
 } from "../../../../test/integration/setup";
 
-import { prisma } from "../../../../infrastructure/database/prisma";
 import { userService } from "../../user.service";
 
+describe("user Integration", () => {
 
-describe("user integration", () => {
+    beforeAll(async () => {
+        await startTestDatabase();
 
-  beforeAll(async () => {
-    await startTestDatabase();
-  }, 60_000);
+        const appModule = await import("../../../../app");
+        app = appModule.app;
+
+        const prismaModule = await import(
+            "../../../../infrastructure/database/prisma"
+        );
+        prisma = prismaModule.prisma;
+    }, 60_000);
 
 
-  beforeEach(async () => {
-    await prisma.user_credentials.deleteMany();
-    await prisma.oauth_accounts.deleteMany();
-    await prisma.users.deleteMany();
-  });
+    beforeEach(async () => {
+        await prisma.applications.deleteMany();
+
+        await prisma.user_credentials.deleteMany();
+        await prisma.oauth_accounts.deleteMany();
+        await prisma.users.deleteMany();
+    });
 
 
-  afterAll(async () => {
-    await prisma.$disconnect();
-
-    await stopTestDatabase();
-  });
+    afterAll(async () => {
+        await prisma.$disconnect();
+        await stopTestDatabase();
+    });
 
 
   describe("userService.getMe", () => {

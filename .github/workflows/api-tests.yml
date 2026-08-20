@@ -63,6 +63,11 @@ jobs:
       #
       # Diese verwenden die Testcontainers-Testdatenbank.
       - name: Run integration tests
+        env:
+          JWT_SECRET: secret
+          GOOGLE_CLIENT_ID: e2e-test-client-id
+          GOOGLE_CLIENT_SECRET: e2e-test-client-secret
+          GOOGLE_GMAIL_REDIRECT_URI: http://localhost:3000/api/gmail/callback
         run: npm run test:integration
 
 

@@ -9,9 +9,8 @@ import {
     beforeEach,
 } from "vitest";
 
-import { app } from "../../../../app";
-
-import { prisma } from "../../../../infrastructure/database/prisma";
+let app: typeof import("../../../../app").app;
+let prisma: typeof import("../../../../infrastructure/database/prisma").prisma;
 
 import {
     startTestDatabase,
@@ -23,6 +22,14 @@ describe("Application API Integration", () => {
 
     beforeAll(async () => {
         await startTestDatabase();
+
+        const appModule = await import("../../../../app");
+        app = appModule.app;
+
+        const prismaModule = await import(
+            "../../../../infrastructure/database/prisma"
+        );
+        prisma = prismaModule.prisma;
     }, 60_000);
 
 
