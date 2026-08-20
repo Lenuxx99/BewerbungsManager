@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { validate } from "@/middleware/validate.middleware";
+import { validate } from "../../middleware/validate.middleware";
 import { login, register, loginWithGoogle, logout } from "./auth.controller";
 import {
   loginSchema,

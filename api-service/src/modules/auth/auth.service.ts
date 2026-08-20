@@ -18,7 +18,7 @@ export class AuthError extends Error {
 export const authService = {
   async register(input: RegisterInput) {
     const existingUser = await authRepository.findUserByEmail(
-      input.email
+      input.email.toLowerCase()
     );
 
     if (existingUser) {

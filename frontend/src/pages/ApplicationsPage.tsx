@@ -7,7 +7,7 @@ import {
 import Sidebar from "../components/Sidebar";
 import ApplicationDetails from "../components/ApplicationDetails";
 import "../styles/ApplicationsPage.css";
-import {DailyApplications} from "../components/DailyApplications";
+import { DailyApplications } from "../components/DailyApplications";
 
 type ApplicationStatus =
     | "OFFEN"
@@ -53,7 +53,9 @@ export default function ApplicationsPage() {
 
     const [firma, setFirma] = useState("");
     const [stelle, setStelle] = useState("");
-    const [datum, setDatum] = useState("");
+    const [datum, setDatum] = useState(
+        new Date().toISOString().split("T")[0]
+    );
 
     const [status, setStatus] =
         useState<ApplicationStatus>("OFFEN");
@@ -449,17 +451,11 @@ export default function ApplicationsPage() {
                             <label className="application-field">
                                 <span>Status</span>
 
-                                <select
-                                    value={status}
-                                    onChange={(event) =>
-                                        setStatus(event.target.value as ApplicationStatus)
-                                    }
-                                >
-                                    <option value="OFFEN">Offen</option>
-                                    <option value="INTERVIEW">Interview</option>
-                                    <option value="ZUGESAGT">Zugesagt</option>
-                                    <option value="ABGESAGT">Abgesagt</option>
-                                </select>
+                                <input
+                                    type="text"
+                                    value="Offen"
+                                    readOnly
+                                />
                             </label>
 
                             <label className="application-field application-notes-field">

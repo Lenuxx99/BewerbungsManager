@@ -2,13 +2,13 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-import { errorMiddleware } from "./src/middleware/error.middleware";
-import { authRouter } from "./src/modules/auth/auth.routes";
-import { userRouter } from "./src/modules/user/user.routes";
-import { gmailRouter } from "./src/modules/gmail/gmail.routes";
-import { appRouter } from "./src/modules/application/app.routes";
+import { errorMiddleware } from "./middleware/error.middleware";
+import { authRouter } from "./modules/auth/auth.routes";
+import { userRouter } from "./modules/user/user.routes";
+import { gmailRouter } from "./modules/gmail/gmail.routes";
+import { appRouter } from "./modules/application/app.routes";
 
-const app = express();
+export const app = express();
 
 /*
  * Erlaubt Anfragen vom React-Frontend (in Entwicklung).
