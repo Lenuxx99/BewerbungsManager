@@ -1,0 +1,73 @@
+name: API CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "api-service/**"
+      - ".github/workflows/api-ci.yml"
+
+jobs:
+  test:
+    name: API Tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: api-service
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22.22.0"
+          cache: npm
+          cache-dependency-path: api-service/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Integration tests
+        env:
+          JWT_SECRET: secret
+          GOOGLE_CLIENT_ID: test
+          GOOGLE_CLIENT_SECRET: test
+          GOOGLE_GMAIL_REDIRECT_URI: http://localhost:3000/api/gmail/callback
+        run: npm run test:integration
+
+      - name: Start E2E environment
+        env:
+          JWT_SECRET: secret
+          GOOGLE_CLIENT_ID: test
+          GOOGLE_CLIENT_SECRET: test
+          GOOGLE_GMAIL_REDIRECT_URI: http://localhost:3000/api/gmail/callback
+        run: docker compose -f docker-compose.e2e.yml up -d --build
+
+      - name: Wait for API
+        run: |
+          for i in {1..30}; do
+            if curl --silent --output /dev/null http://localhost:3000/api/user/me; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          docker compose -f docker-compose.e2e.yml logs
+          exit 1
+
+      - name: E2E tests
+        run: npm run test:e2e
+
+      - name: Stop E2E environment
+        if: always()
+        run: docker compose -f docker-compose.e2e.yml down -v
