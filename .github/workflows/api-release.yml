@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "api-service/**"
+      - ".github/workflows/api-release.yml"
 
 permissions:
   contents: read

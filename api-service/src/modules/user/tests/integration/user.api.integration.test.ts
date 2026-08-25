@@ -18,7 +18,7 @@ import {
 } from "../../../../test/integration/setup";
 
 
-describe("Application API Integration", () => {
+describe("User API Integration", () => {
 
     beforeAll(async () => {
         await startTestDatabase();
