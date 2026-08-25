@@ -1,6 +1,8 @@
 name: API Release
 
 on:
+  workflow_dispatch:
+
   # Release nur nach Änderungen am API-Service oder Release-Workflow
   push:
     branches:
@@ -41,7 +43,7 @@ jobs:
       - name: Build image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: bewerbungmanager-api
+          ECR_REPOSITORY: bewerbungsmanager-api
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build \
@@ -52,7 +54,7 @@ jobs:
       - name: Push image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: bewerbungmanager-api
+          ECR_REPOSITORY: bewerbungsmanager-api
           IMAGE_TAG: ${{ github.sha }}
         run: |
           docker push \
@@ -75,7 +77,7 @@ jobs:
 
           git switch -c gitops/update-api-${{ github.sha }}
 
-          git add helm/bewerbungmanager-api/values.yaml
+          git add helm/bewerbungsmanager-api/values.yaml
 
           git commit \
             -m "gitops: deploy API ${{ github.sha }}"

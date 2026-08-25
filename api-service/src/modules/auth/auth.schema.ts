@@ -35,6 +35,5 @@ export type LoginInput = z.infer<
   typeof loginSchema
 >["body"];
 
-
 export type GoogleLoginInput =
   z.infer<typeof googleLoginSchema>["body"];
