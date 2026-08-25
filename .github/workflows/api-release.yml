@@ -1,6 +1,7 @@
 name: API Release
 
 on:
+  # Release nur nach Änderungen am API-Service oder Release-Workflow
   push:
     branches:
       - main
@@ -8,8 +9,10 @@ on:
       - "api-service/**"
       - ".github/workflows/api-release.yml"
 
+# Berechtigungen für GitOps-Commit, PR und AWS OIDC
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
   id-token: write
 
 jobs:
@@ -18,19 +21,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Repository auf den GitHub Runner laden
       - name: Checkout
         uses: actions/checkout@v6
 
+      # Temporäre AWS-Credentials über GitHub OIDC beziehen
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: eu-north-1
 
+      # Docker bei Amazon ECR authentifizieren
       - name: Login to ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      # API Docker Image bauen und Commit-SHA als Tag verwenden
       - name: Build image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -41,6 +48,7 @@ jobs:
             -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
             ./api-service
 
+      # Gebautes API Image nach Amazon ECR pushen
       - name: Push image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -49,3 +57,46 @@ jobs:
         run: |
           docker push \
             $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      # Helm auf die neu veröffentlichte Image-Version aktualisieren
+      - name: Update Helm image tag
+        uses: mikefarah/yq@v4
+        with:
+          cmd: >
+            yq -i
+            '.image.tag = "${{ github.sha }}"'
+            helm/bewerbungmanager-api/values.yaml
+
+      # GitOps-Branch mit der aktualisierten Helm-Konfiguration erstellen
+      - name: Create GitOps branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git switch -c gitops/update-api-${{ github.sha }}
+
+          git add helm/bewerbungmanager-api/values.yaml
+
+          git commit \
+            -m "gitops: deploy API ${{ github.sha }}"
+
+          git push \
+            origin gitops/update-api-${{ github.sha }}
+
+      # Pull Request für die neue Deployment-Version erstellen und Auto-Merge aktivieren
+      - name: Create GitOps pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH="gitops/update-api-${{ github.sha }}"
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "gitops: deploy API ${{ github.sha }}" \
+            --body "Update API image tag for Argo CD deployment."
+
+          gh pr merge "$BRANCH" \
+            --squash \
+            --auto \
+            --delete-branch

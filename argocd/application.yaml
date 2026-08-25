@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+
+metadata:
+  name: bewerbungmanager-api
+  namespace: argocd
+
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/Lenuxx99/BewerbungsManager
+    targetRevision: main
+    path: helm/bewerbungmanager-api
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: bewerbungmanager
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+    syncOptions:
+      - CreateNamespace=true
