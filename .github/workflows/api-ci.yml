@@ -7,7 +7,6 @@ on:
     paths:
       - "api-service/**"
       - ".github/workflows/api-ci.yml"
-
 jobs:
   test:
     name: API Tests
