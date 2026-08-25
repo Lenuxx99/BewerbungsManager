@@ -81,7 +81,7 @@ const appRepository = {
         interview_date: "asc",
       },
     });
-  }, 
+  },
 
   async updateApplication(
     id: number,

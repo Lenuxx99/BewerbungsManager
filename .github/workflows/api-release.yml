@@ -65,7 +65,7 @@ jobs:
           cmd: >
             yq -i
             '.image.tag = "${{ github.sha }}"'
-            helm/bewerbungmanager-api/values.yaml
+            helm/bewerbungsmanager-api/values.yaml
 
       # GitOps-Branch mit der aktualisierten Helm-Konfiguration erstellen
       - name: Create GitOps branch
