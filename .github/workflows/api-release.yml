@@ -70,13 +70,12 @@ jobs:
             helm/bewerbungsmanager-api/values.yaml
 
       # GitOps-Branch mit der aktualisierten Helm-Konfiguration erstellen
-      # GitOps-Branch mit der aktualisierten Helm-Konfiguration erstellen
       - name: Create GitOps branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          BRANCH="gitops/update-api-${{ github.sha }}-${{ github.run_id }}"
+          BRANCH="gitops/update-api-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}"
 
           git switch -c "$BRANCH"
 
@@ -94,7 +93,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          BRANCH="gitops/update-api-${{ github.sha }}-${{ github.run_id }}"
+          BRANCH="gitops/update-api-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}"
 
           gh pr create \
             --base main \
@@ -106,3 +105,19 @@ jobs:
             --squash \
             --auto \
             --delete-branch
+
+      - name: Cleanup old GitOps branches
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch origin
+
+          git branch -r \
+            | grep "origin/gitops/update-api-${{ github.sha }}-${{ github.run_id }}-" \
+            | sed 's#origin/##' \
+            | while read BRANCH; do
+                if [ "$BRANCH" != "gitops/update-api-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}" ]; then
+                  git push origin --delete "$BRANCH" || true
+                fi
+              done
