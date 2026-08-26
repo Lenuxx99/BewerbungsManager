@@ -1,0 +1,62 @@
+name: Helm Check
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "helm/bewerbungsmanager-api/**"
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - closed
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+
+  # Helm-Chart prüfen, solange der PR offen ist
+  helm-check:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm lint
+        run: |
+          helm lint helm/bewerbungsmanager-api
+
+      - name: Render Helm templates
+        run: |
+          helm template \
+            bewerbungsmanager-api \
+            helm/bewerbungsmanager-api
+
+  # GitOps-Branch nach erfolgreichem Merge löschen
+  cleanup-gitops-branch:
+    if: >
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true &&
+      startsWith(github.event.pull_request.head.ref, 'gitops/update-api-')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Delete GitOps branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          echo "Deleting GitOps branch: $BRANCH"
+
+          gh api \
+            --method DELETE \
+            "repos/${GITHUB_REPOSITORY}/git/refs/heads/${BRANCH}" \
+            || true

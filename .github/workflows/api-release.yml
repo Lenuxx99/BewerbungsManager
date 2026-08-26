@@ -101,11 +101,6 @@ jobs:
             --title "gitops: deploy API ${{ github.sha }}" \
             --body "Update API image tag for Argo CD deployment."
 
-          gh pr merge "$BRANCH" \
-            --squash \
-            --auto \
-            --delete-branch
-
       - name: Cleanup old GitOps branches
         if: success()
         env:
