@@ -70,27 +70,31 @@ jobs:
             helm/bewerbungsmanager-api/values.yaml
 
       # GitOps-Branch mit der aktualisierten Helm-Konfiguration erstellen
+      # GitOps-Branch mit der aktualisierten Helm-Konfiguration erstellen
       - name: Create GitOps branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git switch -c gitops/update-api-${{ github.sha }}
+          BRANCH="gitops/update-api-${{ github.sha }}-${{ github.run_id }}"
+
+          git switch -c "$BRANCH"
 
           git add helm/bewerbungsmanager-api/values.yaml
 
           git commit \
             -m "gitops: deploy API ${{ github.sha }}"
 
-          git push \
-            origin gitops/update-api-${{ github.sha }}
+          git push origin "$BRANCH"
+
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
 
       # Pull Request für die neue Deployment-Version erstellen und Auto-Merge aktivieren
       - name: Create GitOps pull request
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          BRANCH="gitops/update-api-${{ github.sha }}"
+          BRANCH="gitops/update-api-${{ github.sha }}-${{ github.run_id }}"
 
           gh pr create \
             --base main \
