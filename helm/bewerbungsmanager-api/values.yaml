@@ -1,17 +1,13 @@
 replicaCount: 2
-
 image:
   repository: 787107040006.dkr.ecr.eu-north-1.amazonaws.com/bewerbungmanager-api
-  tag: ""
+  tag: "5d08e525b0a79cb2a39e394e4f1749b90a409530"
   pullPolicy: IfNotPresent
-
 service:
   type: ClusterIP
   port: 80
   targetPort: 3000
-
 containerPort: 3000
-
 resources:
   requests:
     cpu: 100m
@@ -19,17 +15,14 @@ resources:
   limits:
     cpu: 500m
     memory: 512Mi
-
 readinessProbe:
   path: /health
   initialDelaySeconds: 5
   periodSeconds: 10
-
 livenessProbe:
   path: /health
   initialDelaySeconds: 15
   periodSeconds: 20
-
 ingress:
   enabled: true
   className: alb
