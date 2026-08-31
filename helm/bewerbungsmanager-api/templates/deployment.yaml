@@ -25,6 +25,10 @@ spec:
           env:
             - name: GOOGLE_CLIENT_ID
               value: {{ .Values.env.GOOGLE_CLIENT_ID | quote }}
+            - name: GOOGLE_CLIENT_SECRET
+              value: {{ .Values.env.GOOGLE_CLIENT_SECRET | quote }}
+            - name: GOOGLE_GMAIL_REDIRECT_URI
+              value: {{ .Values.env.GOOGLE_GMAIL_REDIRECT_URI | quote }}
 
           ports:
             - containerPort: {{ .Values.containerPort }}
