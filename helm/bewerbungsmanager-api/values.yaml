@@ -8,6 +8,8 @@ service:
   port: 80
   targetPort: 3000
 containerPort: 3000
+env:
+  GOOGLE_CLIENT_ID: "381652459210-fm86v7drqcfqcpl9vpcdtbar305517l1.apps.googleusercontent.com"
 resources:
   requests:
     cpu: 100m

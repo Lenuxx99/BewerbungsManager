@@ -22,6 +22,10 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
 
+          env:
+            - name: GOOGLE_CLIENT_ID
+              value: {{ .Values.env.GOOGLE_CLIENT_ID | quote }}
+
           ports:
             - containerPort: {{ .Values.containerPort }}
 
