@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/Lenuxx99/BewerbungsManager
     targetRevision: main
-    path: helm/bewerbunsgmanager-api
+    path: helm/bewerbungsmanager-api
 
   destination:
     server: https://kubernetes.default.svc
