@@ -110,6 +110,11 @@ app.use("/api/applications", appRouter);
 
 app.use("/api/gmail", gmailRouter);
 
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok"
+  });
+});
 
 /*
  * Zentrale Fehlerbehandlung.
