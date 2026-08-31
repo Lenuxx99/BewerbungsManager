@@ -10,6 +10,8 @@ service:
 containerPort: 3000
 env:
   GOOGLE_CLIENT_ID: "381652459210-fm86v7drqcfqcpl9vpcdtbar305517l1.apps.googleusercontent.com"
+  GOOGLE_CLIENT_SECRET: test
+  GOOGLE_GMAIL_REDIRECT_URI: http://localhost:3000/api/gmail/callback
 resources:
   requests:
     cpu: 100m
