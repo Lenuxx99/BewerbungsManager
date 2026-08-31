@@ -1,7 +1,7 @@
 replicaCount: 2
 image:
   repository: 787107040006.dkr.ecr.eu-north-1.amazonaws.com/bewerbungmanager-api
-  tag: "f58f779d82508081eb59861d1727b1fdf5121360"
+  tag: "144332adc72beb6506c23efc18b9cda2914c50c3"
   pullPolicy: IfNotPresent
 service:
   type: ClusterIP
