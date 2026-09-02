@@ -50,3 +50,7 @@ coverage/
 *.temp
 
 ghodwa.txt
+
+EKS_ArgoCD_Helm_GitOps_dok.pdf
+GitHub_Branch_Rules_und_Auto-Merge.pdf
+Kubernetes_Port_Ablauf_Ingress_Service_Pod.pdf
