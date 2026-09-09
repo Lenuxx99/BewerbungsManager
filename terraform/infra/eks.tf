@@ -6,8 +6,8 @@ module "eks" {
   kubernetes_version = var.kubernetes_version
 
   # EKS Control Plane Logging deaktivieren
-  enabled_log_types            = []
-  create_cloudwatch_log_group  = false
+  enabled_log_types           = []
+  create_cloudwatch_log_group = false
 
   # Keinen eigenen KMS-Key erstellen
   create_kms_key    = false
@@ -32,7 +32,7 @@ module "eks" {
 
   # EKS Add-ons
   addons = {
-    coredns = {}
+    coredns    = {}
     kube-proxy = {}
     vpc-cni = {
       service_account_role_arn = aws_iam_role.vpc_cni.arn
