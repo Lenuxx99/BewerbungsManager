@@ -54,6 +54,10 @@ resource "aws_iam_role_policy_attachment" "eks_ecr_pull_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPullOnly"
 }
 
+resource "aws_iam_role_policy_attachment" "eks_nodes_ssm" {
+  role       = aws_iam_role.eks_nodes.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
 
 # VPC CNI IAM Role
 data "aws_iam_policy_document" "vpc_cni_assume_role" {
