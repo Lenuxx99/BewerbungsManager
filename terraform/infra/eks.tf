@@ -32,14 +32,14 @@ module "eks" {
 
   # EKS Add-ons
   addons = {
-  coredns    = {}
-  kube-proxy = {}
+    coredns    = {}
+    kube-proxy = {}
 
-  vpc-cni = {
-    before_compute           = true
-    service_account_role_arn = aws_iam_role.vpc_cni.arn
+    vpc-cni = {
+      before_compute           = true
+      service_account_role_arn = aws_iam_role.vpc_cni.arn
+    }
   }
-}
 
   # Managed Node Group
   eks_managed_node_groups = {
