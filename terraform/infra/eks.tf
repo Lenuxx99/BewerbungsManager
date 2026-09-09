@@ -5,6 +5,14 @@ module "eks" {
   name               = var.cluster_name
   kubernetes_version = var.kubernetes_version
 
+  # EKS Control Plane Logging deaktivieren
+  enabled_log_types            = []
+  create_cloudwatch_log_group  = false
+
+  # Keinen eigenen KMS-Key erstellen
+  create_kms_key    = false
+  encryption_config = null
+
   # Netzwerk
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
@@ -25,9 +33,7 @@ module "eks" {
   # EKS Add-ons
   addons = {
     coredns = {}
-
     kube-proxy = {}
-
     vpc-cni = {
       service_account_role_arn = aws_iam_role.vpc_cni.arn
     }
@@ -47,7 +53,6 @@ module "eks" {
       max_size     = var.node_max_size
       desired_size = var.node_desired_size
 
-      # Eigene Node IAM Role verwenden
       create_iam_role = false
       iam_role_arn    = aws_iam_role.eks_nodes.arn
 
